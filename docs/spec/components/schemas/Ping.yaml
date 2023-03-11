@@ -1,0 +1,14 @@
+allOf:
+  - $ref: '#/components/schemas/PingKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - now
+        properties:
+          now:
+            type: integer
+            format: int64

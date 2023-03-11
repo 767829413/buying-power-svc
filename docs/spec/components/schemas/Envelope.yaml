@@ -1,0 +1,60 @@
+allOf:
+  - $ref: '#/components/schemas/EnvelopeKey'
+  - type: object
+    required:
+      - relationships
+    properties:
+      relationships:
+        type: object
+        properties:
+          current_lot:
+            type: object
+            description: defines lot for which bidding is active
+            properties:
+              data:
+                $ref: '#/components/schemas/LotKey'
+          error:
+            type: object
+            description: describes errors occured with one of the requests
+            properties:
+              data:
+                $ref: '#/components/schemas/ErrorKey'
+          ok:
+            type: object
+            description: confirms that request has been accepted
+            properties:
+              data:
+                $ref: '#/components/schemas/OkKey'
+          bid:
+            type: object
+            description: defines current bid for the lot
+            properties:
+              data:
+                $ref: '#/components/schemas/BidKey'
+          bonus_time:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/BonusTimeKey'
+          unknown_lot_event:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/UnknownLotEventKey'
+          sale_end:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/EndSaleKey'
+          sold:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/SoldKey'
+          participations:
+            type: object
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ParticipationKey'

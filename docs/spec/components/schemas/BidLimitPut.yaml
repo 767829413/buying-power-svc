@@ -1,0 +1,42 @@
+allOf:
+  - type: object
+    required:
+      - type
+    properties:
+      type:
+        type: string
+        enum:
+          - bid_limits
+  - type: object
+    required:
+      - attributes
+      - relationships
+    properties:
+      attributes:
+        required:
+          - amount
+        type: object
+        properties:
+          amount:
+            type: string
+            format: amount.Fiat
+            description: defines max amount allowed for bidder
+            example: '123.00'
+      relationships:
+        type: object
+        required:
+          - lot
+          - account
+        properties:
+          lot:
+            type: object
+            description: .....
+            properties:
+              data:
+                $ref: '#/components/schemas/LotKey'
+          account:
+            type: object
+            description: ......
+            properties:
+              data:
+                $ref: '#/components/schemas/IdentityKey'

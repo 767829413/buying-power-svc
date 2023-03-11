@@ -1,0 +1,1918 @@
+openapi: 3.0.0
+info:
+  version: 0.1.0
+  title: Buying-power service
+  x-logo:
+    url: 'https://static.wixstatic.com/media/0cc997_9a88f1825e12451d80e7a907b87d2796~mv2.png'
+  description: Manages deposits of the users
+servers:
+  - url: 'https://api.dev.shelf.network/buying-power'
+paths:
+  /deposit_options:
+    get:
+      parameters:
+        - in: query
+          name: 'filter[depositor]'
+          schema:
+            type: string
+        - in: query
+          name: include
+          schema:
+            type: string
+            enum:
+              - deposits_to_attach
+              - deposit_to_create
+      summary: Returns list of deposits allowed to perform for depositor
+      operationId: getDepositOptions
+      tags:
+        - Deposits
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DepositOption'
+                  links:
+                    $ref: '#/components/schemas/Links'
+  '/deposit_options/{lot}':
+    get:
+      parameters:
+        - in: query
+          name: 'filter[depositor]'
+          schema:
+            type: string
+        - in: query
+          name: 'filter[is_buy_now]'
+          description: signals if we need to calculate options for buy now
+          schema:
+            type: bool
+        - in: query
+          name: 'filter[customer_price]'
+          description: price customer is willing to pay
+          schema:
+            type: string
+            format: amount.Fiat
+            example: '200.00'
+        - in: query
+          name: 'filter[customer_price_currency]'
+          description: currency of the customer price
+          schema:
+            type: string
+            example: USD
+        - in: query
+          name: include
+          schema:
+            type: string
+            enum:
+              - deposits_to_attach
+              - deposit_to_create
+      summary: Returns list of deposits allowed to attach to specified lot
+      operationId: getDepositOptionsLot
+      tags:
+        - Deposits
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/DepositOption'
+                  links:
+                    $ref: '#/components/schemas/Links'
+  /deposits:
+    post:
+      summary: Create Deposit
+      operationId: createDeposit
+      security:
+        - UserBearerAuth: []
+      description: User must have verified phone
+      tags:
+        - Deposits
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/DepositCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Deposit'
+    get:
+      parameters:
+        - in: query
+          name: 'filter[depositor]'
+          schema:
+            type: string
+        - in: query
+          name: 'filter[lot]'
+          schema:
+            type: string
+        - in: query
+          name: 'filter[state]'
+          schema:
+            type: string
+            enum:
+              - STATE_UNKNOWN
+              - STATE_PENDING
+              - STATE_PAID
+              - STATE_RETURNED
+              - STATE_FEE_CHARGED
+              - STATE_FAILED
+              - STATE_REVERSED
+              - STATE_LOCKED
+              - STATE_RETURNING
+              - STATE_REQUESTED_WITHDRAWAL
+        - in: query
+          name: 'page[limit]'
+          description: Defines limit of the page (default `10`).
+          schema:
+            type: string
+        - in: query
+          name: 'page[number]'
+          description: Defines the number of the page to return (default `0`).
+          schema:
+            type: string
+        - in: query
+          name: include
+          schema:
+            type: string
+            enum:
+              - withdrawals
+      summary: Deposits
+      operationId: getDepositsList
+      tags:
+        - Deposits
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Deposit'
+                  links:
+                    $ref: '#/components/schemas/Links'
+                  included:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/Withdrawal'
+  '/deposits/{deposit}':
+    patch:
+      summary: Patch Deposit
+      operationId: patchDeposit
+      security:
+        - AdminBearerAuth: []
+      tags:
+        - Deposits
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/DepositPatch'
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Deposit'
+  '/lots/{lot}/participants':
+    parameters:
+      - in: path
+        name: lot
+        schema:
+          type: string
+          example: 413513212
+        required: true
+    delete:
+      summary: Mark as lost all participants
+      operationId: lostParticipants
+      tags:
+        - Participants
+      responses:
+        '204':
+          description: No Content
+  '/lots/{lot}/participants/{account}':
+    parameters:
+      - in: path
+        name: lot
+        schema:
+          type: string
+          example: 413513212
+        required: true
+      - in: path
+        name: account
+        schema:
+          type: string
+          example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+        required: true
+    delete:
+      summary: Reject participant
+      operationId: rejectParticipant
+      tags:
+        - Participants
+      responses:
+        '204':
+          description: No Content
+  '/lots/{lot}/relationships/deposits':
+    parameters:
+      - in: path
+        name: lot
+        schema:
+          type: string
+          example: 413513212
+        required: true
+    put:
+      deprecated: true
+      summary: Attach deposits to lot
+      operationId: attachDeposits
+      security:
+        - UserBearerAuth: []
+      tags:
+        - Deposits
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                data:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/DepositKey'
+      responses:
+        '204':
+          description: No Content
+  '/lots/{lot}/winner':
+    parameters:
+      - in: path
+        name: lot
+        schema:
+          type: string
+          example: 19846712
+        required: true
+    put:
+      summary: Upsert winner details and marks participant as winner.
+      operationId: upsertWinnerDetails
+      tags:
+        - Winners
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/PutWinner'
+      responses:
+        '204':
+          description: No Content
+  /participants:
+    put:
+      summary: Create participant.
+      operationId: upsertParticipant
+      tags:
+        - Participants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/ParticipantPut'
+      responses:
+        '204':
+          description: No Content
+  /participants/auto_bid_limit:
+    put:
+      summary: Set auto bid limit
+      operationId: upsertMaxBid
+      tags:
+        - Participants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/AutoBidLimitPut'
+      responses:
+        '204':
+          description: No Content
+  /participants/bid_limit:
+    put:
+      summary: Set bid limit
+      operationId: setBidLimit
+      tags:
+        - Participants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/BidLimitPut'
+      responses:
+        '204':
+          description: No Content
+  /participants/bid:
+    put:
+      summary: Set bid
+      operationId: setBid
+      tags:
+        - Participants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/BidPut'
+      responses:
+        '204':
+          description: No Content
+  /participants/buy_now:
+    put:
+      summary: Request buy now
+      operationId: requestBuyNow
+      tags:
+        - Participants
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/BuyNowPost'
+      responses:
+        '204':
+          description: No Content
+  /withdrawals:
+    post:
+      summary: Create Withdrawal
+      operationId: createWithdrawal
+      security:
+        - UserBearerAuth: []
+      tags:
+        - Withdrawals
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/DepositKey'
+      responses:
+        '200':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Withdrawal'
+  /ws:
+    get:
+      summary: Subscribe to bidding events
+      operationId: ws
+      security:
+        - UserBearerAuth: []
+      description: 'JWT token must be first message sent to the connection. Request and Response defines schemas for write and read envelopes. To connect use `wss://buyws.dev.shelf.network/ws/`'
+      tags:
+        - Bidding
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - data
+              properties:
+                data:
+                  $ref: '#/components/schemas/EnvelopeRequest'
+                included:
+                  type: array
+                  items:
+                    oneOf:
+                      - $ref: '#/components/schemas/Token'
+                      - $ref: '#/components/schemas/LiveBid'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Envelope'
+                  included:
+                    type: array
+                    items:
+                      oneOf:
+                        - $ref: '#/components/schemas/Error'
+                        - $ref: '#/components/schemas/Bid'
+                        - $ref: '#/components/schemas/BonusTime'
+                        - $ref: '#/components/schemas/Sold'
+                        - $ref: '#/components/schemas/EndSale'
+                        - $ref: '#/components/schemas/Lot'
+                        - $ref: '#/components/schemas/Vehicle'
+                        - $ref: '#/components/schemas/Participation'
+components:
+  schemas:
+    AutoBidLimitPut:
+      allOf:
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - auto_bid_limits
+        - type: object
+          required:
+            - attributes
+            - relationships
+          properties:
+            attributes:
+              required:
+                - amount
+              type: object
+              properties:
+                amount:
+                  type: string
+                  format: amount.Fiat
+                  description: defines max amount for the bid
+                  example: '123.00'
+            relationships:
+              type: object
+              required:
+                - lot
+                - account
+              properties:
+                lot:
+                  type: object
+                  description: .
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/LotKey'
+                account:
+                  type: object
+                  description: .
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/IdentityKey'
+    Bid:
+      allOf:
+        - $ref: '#/components/schemas/BidKey'
+        - type: object
+          required:
+            - relationships
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - amount
+                - next_bid_amount
+                - currency
+              properties:
+                amount:
+                  type: string
+                  format: amount.Fiat
+                  description: defines amount of bid
+                  example: '123.00'
+                next_bid_amount:
+                  type: string
+                  format: amount.Fiat
+                  description: defines next bid amount
+                  example: '123.00'
+                currency:
+                  type: string
+                  description: defines currency of the bid
+                  example: USD
+            relationships:
+              type: object
+              required:
+                - lot
+                - bidder
+              properties:
+                lot:
+                  type: object
+                  description: defines lot to which this bid is attached
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/LotKey'
+                bidder:
+                  type: object
+                  description: defines buyer of the lot
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/IdentityKey'
+                sale:
+                  type: object
+                  description: defines sale in which bid took place
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/SaleKey'
+    BidKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+        type:
+          type: string
+          enum:
+            - bids
+    BidLimitPut:
+      allOf:
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - bid_limits
+        - type: object
+          required:
+            - attributes
+            - relationships
+          properties:
+            attributes:
+              required:
+                - amount
+              type: object
+              properties:
+                amount:
+                  type: string
+                  format: amount.Fiat
+                  description: defines max amount allowed for bidder
+                  example: '123.00'
+            relationships:
+              type: object
+              required:
+                - lot
+                - account
+              properties:
+                lot:
+                  type: object
+                  description: .....
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/LotKey'
+                account:
+                  type: object
+                  description: ......
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/IdentityKey'
+    BidPut:
+      allOf:
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - bids
+        - type: object
+          required:
+            - attributes
+            - relationships
+          properties:
+            attributes:
+              required:
+                - amount
+              type: object
+              properties:
+                amount:
+                  type: string
+                  format: amount.Fiat
+                  description: defines max amount for the bid
+                  example: '123.00'
+            relationships:
+              type: object
+              required:
+                - lot
+                - account
+              properties:
+                lot:
+                  type: object
+                  description: ....
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/LotKey'
+                account:
+                  type: object
+                  description: ....
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/IdentityKey'
+    BonusTime:
+      allOf:
+        - $ref: '#/components/schemas/BonusTimeKey'
+        - type: object
+          required:
+            - attributes
+            - relationships
+          properties:
+            attributes:
+              type: object
+              required:
+                - duration_s
+              properties:
+                duration_s:
+                  type: integer
+                  format: int64
+                  description: defines duration of the timer to show to user
+            relationships:
+              type: object
+              required:
+                - sale
+              properties:
+                lot:
+                  type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/LotKey'
+                sale:
+                  type: object
+                  description: ..
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/SaleKey'
+    BonusTimeKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+        type:
+          type: string
+          enum:
+            - bonus_times
+    BuyNowPost:
+      allOf:
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - buy_nows
+        - type: object
+          required:
+            - relationships
+          properties:
+            relationships:
+              type: object
+              required:
+                - lot
+                - account
+              properties:
+                lot:
+                  type: object
+                  description: ...
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/LotKey'
+                account:
+                  type: object
+                  description: ...
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/IdentityKey'
+    Deposit:
+      allOf:
+        - $ref: '#/components/schemas/DepositKey'
+        - type: object
+          required:
+            - relationships
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - state
+                - amount
+                - currency
+                - created_at
+                - updated_at
+              properties:
+                state:
+                  type: string
+                  enum:
+                    - STATE_UNKNOWN
+                    - STATE_PENDING
+                    - STATE_PAID
+                    - STATE_RETURNED
+                    - STATE_FEE_CHARGED
+                    - STATE_FAILED
+                    - STATE_REVERSED
+                    - STATE_LOCKED
+                    - STATE_RETURNING
+                    - STATE_REQUESTED_WITHDRAWAL
+                amount:
+                  type: string
+                  format: amount.Fiat
+                  description: defines amount of the deposit in cents in the currency of the deposit.
+                  example: '123.00'
+                currency:
+                  type: string
+                  description: defines currency of the deposit in ISO4217
+                  example: USD
+                created_at:
+                  type: string
+                  format: time.Time
+                updated_at:
+                  type: string
+                  format: time.Time
+            relationships:
+              type: object
+              required:
+                - depositor
+              properties:
+                depositor:
+                  type: object
+                  description: defines account that performed deposit.
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/IdentityKey'
+                lot:
+                  type: object
+                  description: defines lot to which this deposit is attached
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/LotKey'
+                withdrawals:
+                  type: object
+                  description: defines withdrawals for the deposit
+                  properties:
+                    data:
+                      type: array
+                      item:
+                        $ref: '#/components/schemas/WithdrawalKey'
+    DepositCreate:
+      allOf:
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - deposits
+        - type: object
+          required:
+            - attributes
+            - relationships
+          properties:
+            attributes:
+              required:
+                - amount
+                - currency
+              type: object
+              properties:
+                amount:
+                  type: string
+                  format: amount.Fiat
+                  description: defines amount of the deposit in cents in the currency of the deposit
+                  example: '123.00'
+                currency:
+                  description: defines currency of the deposit in ISO4217
+                  type: string
+                  example: USD
+            relationships:
+              type: object
+              required:
+                - depositor
+              properties:
+                depositor:
+                  type: object
+                  description: defines account that performed deposit
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/IdentityKey'
+    DepositKey:
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        type:
+          type: string
+          enum:
+            - deposits
+        id:
+          type: string
+          example: 01BX5ZZKBKACTAV9WEVGEMMVRZ
+    DepositOption:
+      allOf:
+        - $ref: '#/components/schemas/DepositOptionKey'
+        - type: object
+          required:
+            - relationships
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - amount
+                - amount_currency
+                - buying_power
+                - buying_power_currency
+                - state
+              properties:
+                amount:
+                  type: string
+                  format: amount.Fiat
+                  description: defines amount of the deposit in cents
+                  example: '123.00'
+                amount_currency:
+                  type: string
+                  description: defines currency of the amount in ISO4217
+                  example: USD
+                buying_power:
+                  type: string
+                  format: amount.Fiat
+                  description: defines amount of the buying power
+                buying_power_currency:
+                  type: string
+                  description: defines currency of the buying power in ISO4217
+                  example: EUR
+                state:
+                  $ref: '#/components/schemas/DepositOptionState'
+            relationships:
+              type: object
+              properties:
+                deposits_to_attach:
+                  type: object
+                  description: defines account that performed deposit.
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/DepositKey'
+                deposit_to_create:
+                  type: object
+                  description: describe deposit that needs to be created to be able to take specified buying power
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/DepositKey'
+    DepositOptionKey:
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        type:
+          type: string
+          enum:
+            - deposit_options
+        id:
+          type: string
+          example: 01BX5ZZKBKACTAV9WEVGEMMVRZ
+    DepositOptionState:
+      type: string
+      format: types.DepositOptionState
+      enum:
+        - taken
+        - not_available
+        - available
+    DepositPatch:
+      allOf:
+        - $ref: '#/components/schemas/DepositKey'
+        - type: object
+          required:
+            - attributes
+          properties:
+            attributes:
+              type: object
+              properties:
+                state:
+                  type: string
+                  enum:
+                    - STATE_RETURNING
+                    - STATE_PAID
+    EndSale:
+      allOf:
+        - $ref: '#/components/schemas/EndSaleKey'
+        - type: object
+          required:
+            - relationships
+            - attributes
+          properties:
+            attributes:
+              required:
+                - reason
+              type: object
+              properties:
+                reason:
+                  type: string
+            relationships:
+              type: object
+              required:
+                - sale
+              properties:
+                sale:
+                  type: object
+                  description: defines sale that ended
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/SaleKey'
+    EndSaleKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+        type:
+          type: string
+          enum:
+            - end_sales
+    Envelope:
+      allOf:
+        - $ref: '#/components/schemas/EnvelopeKey'
+        - type: object
+          required:
+            - relationships
+          properties:
+            relationships:
+              type: object
+              properties:
+                current_lot:
+                  type: object
+                  description: defines lot for which bidding is active
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/LotKey'
+                error:
+                  type: object
+                  description: describes errors occured with one of the requests
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/ErrorKey'
+                ok:
+                  type: object
+                  description: confirms that request has been accepted
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/OkKey'
+                bid:
+                  type: object
+                  description: defines current bid for the lot
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/BidKey'
+                bonus_time:
+                  type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/BonusTimeKey'
+                unknown_lot_event:
+                  type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/UnknownLotEventKey'
+                sale_end:
+                  type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/EndSaleKey'
+                sold:
+                  type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/SoldKey'
+                participations:
+                  type: object
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ParticipationKey'
+    EnvelopeKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+          description: defines ID of the request. Empty for common events
+        type:
+          type: string
+          enum:
+            - envelopes
+    EnvelopeRequest:
+      allOf:
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - envelopes
+        - type: object
+          required:
+            - relationships
+          properties:
+            relationships:
+              type: object
+              properties:
+                subscribe:
+                  type: object
+                  description: defines sale
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/SaleKey'
+                subscribe_participation:
+                  type: object
+                  description: defines identity of the participation
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/IdentityKey'
+                unsubscribe:
+                  type: object
+                  description: defines sale from which we should unsubscribe
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/SaleKey'
+                authorize:
+                  type: object
+                  description: defines token that is used for authorization. Must be sent first after connection
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/TokenKey'
+                bid:
+                  type: object
+                  description: defines bid to be placed for the lot
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/LiveBidKey'
+                ping:
+                  type: object
+                  description: defines app level ping
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/PingKey'
+    Error:
+      allOf:
+        - $ref: '#/components/schemas/ErrorKey'
+        - type: object
+          required:
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - code
+                - message
+              properties:
+                code:
+                  type: integer
+                message:
+                  type: string
+    ErrorKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+        type:
+          type: string
+          enum:
+            - errors
+    IdentityKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+        type:
+          type: string
+          enum:
+            - identities
+    Links:
+      type: object
+      required:
+        - self
+        - prev
+        - next
+      properties:
+        self:
+          type: string
+        prev:
+          type: string
+        next:
+          type: string
+    LiveBid:
+      allOf:
+        - $ref: '#/components/schemas/LiveBidKey'
+        - type: object
+          required:
+            - relationships
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - amount
+              properties:
+                amount:
+                  type: string
+                  format: amount.Fiat
+                  description: defines amount of bid
+                  example: '123.00'
+            relationships:
+              type: object
+              required:
+                - lot
+              properties:
+                lot:
+                  type: object
+                  description: defines lot to which live bid is attached
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/LotKey'
+    LiveBidKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+        type:
+          type: string
+          enum:
+            - live_bids
+    Lot:
+      allOf:
+        - $ref: '#/components/schemas/LotKey'
+        - type: object
+          required:
+            - attributes
+            - relationships
+          properties:
+            attributes:
+              type: object
+              required:
+                - currency
+                - buy_now_price
+                - business_total_price
+                - business_fee
+                - customer_total_price
+                - customer_fee
+                - created_at
+                - duration
+                - end_time
+                - highest_bid
+                - lot_type
+                - lot_type_i
+                - max_bid_step
+                - min_bid_step
+                - start_price
+                - start_time
+                - state
+                - state_updated_at
+                - is_bid_final
+                - name
+              properties:
+                currency:
+                  type: string
+                  example: EUR
+                  description: Currency to calculate some of lot properties
+                business_total_price:
+                  type: string
+                  format: amount.Fiat
+                  example: '40000.00'
+                  description: Price of direct sale lot to be bought by business (non-zero only for direct sales).
+                business_fee:
+                  type: string
+                  format: amount.Fiat
+                  example: '50.00'
+                  description: Fee to be paid for business when buying a car - already included in `business_total_price` (non-zero only for direct sales).
+                customer_total_price:
+                  type: string
+                  format: amount.Fiat
+                  example: '35000.00'
+                  description: Price of direct sale lot to be bought by customer (non-zero only for direct sales).
+                customer_fee:
+                  type: string
+                  format: amount.Fiat
+                  example: '100.55'
+                  description: Fee to be paid for customer when buying a car - already included in `customer_total_price` (non-zero only for direct sales).
+                buy_now_price:
+                  type: string
+                  format: amount.Fiat
+                  example: '5000.00'
+                  description: Price to buy lot item without competition (if 0.00 - buy now option is turned off for the lot)
+                created_at:
+                  type: string
+                  format: time.Time
+                  example: '2019-11-02T12:55:44Z'
+                  description: Time when lot was created (may be different with `start_time`)
+                duration:
+                  type: integer
+                  format: int64
+                  example: 4652378
+                  description: Lot duration in seconds.
+                end_time:
+                  format: time.Time
+                  example: '2019-11-02T12:55:44Z'
+                  description: Time when lot finishes accepting bids.
+                ended_at:
+                  format: time.Time
+                  example: '2019-11-02T12:55:44Z'
+                  description: Time when lot was actually claimed as finished/sold.
+                highest_bid:
+                  type: string
+                  format: amount.Fiat
+                  example: '25.00'
+                  description: Highest bid for current time (currency is defined by `currency` field)
+                lot_type:
+                  type: string
+                  example: TYPE_ENG
+                  enum:
+                    - TYPE_NO_AUCTION
+                    - TYPE_ENG
+                    - TYPE_COPART
+                    - TYPE_IAAI
+                    - TYPE_BNP
+                lot_type_i:
+                  type: integer
+                  format: int32
+                  example: 2
+                max_bid_step:
+                  type: string
+                  format: amount.Fiat
+                  example: '50.00'
+                  description: Maximum step to update bid.
+                min_bid_step:
+                  type: string
+                  format: amount.Fiat
+                  example: '50.00'
+                  description: Minimum step to update bid.
+                start_price:
+                  type: string
+                  format: amount.Fiat
+                  example: '2500.00'
+                  description: Price to start a bidding process from.
+                start_time:
+                  format: time.Time
+                  example: '2019-11-02T12:55:44Z'
+                  description: Time lot becomes open for bids.
+                state:
+                  type: string
+                  example: 2
+                  description: Defines current state of the lot.
+                  enum:
+                    - STATE_UNKNOWN
+                    - STATE_PENDING
+                    - STATE_SOLD
+                    - STATE_FINISHED
+                state_updated_at:
+                  type: string
+                  format: time.Time
+                  example: '2019-11-02T12:55:44Z'
+                  description: Last time when lot state was updated.
+                is_bid_final:
+                  type: bool
+                name:
+                  type: string
+                item_number:
+                  type: integer
+                  format: int64
+            relationships:
+              type: object
+              required:
+                - organizer
+                - platform
+                - vehicle
+              properties:
+                vehicle:
+                  type: object
+                  description: Details of the vehicle that is being sold
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/VehicleKey'
+                participations:
+                  type: object
+                  description: Active participations of the lot
+                  required:
+                    - data
+                organizer:
+                  type: object
+                  description: Identity of lot organizer.
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/IdentityKey'
+                platform:
+                  type: object
+                  description: Platform where the lot was created.
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/IdentityKey'
+                sale:
+                  type: object
+                  description: Sale of the lot
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/SaleKey'
+    LotKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: '11'
+        type:
+          type: string
+          enum:
+            - lots
+    OkKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+        type:
+          type: string
+          enum:
+            - oks
+    ParticipantPut:
+      allOf:
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - participants
+        - type: object
+          required:
+            - relationships
+          properties:
+            relationships:
+              type: object
+              required:
+                - deposits
+                - lot
+                - account
+              properties:
+                lot:
+                  type: object
+                  description: ..
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/LotKey'
+                account:
+                  type: object
+                  description: ..
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/IdentityKey'
+                deposits:
+                  type: object
+                  description: ..
+                  properties:
+                    data:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/DepositKey'
+    Participation:
+      allOf:
+        - $ref: '#/components/schemas/ParticipationKey'
+        - type: object
+          required:
+            - attributes
+            - relationships
+          properties:
+            attributes:
+              type: object
+              required:
+                - state
+                - created_at
+                - requested_buy_now
+                - current_bid
+                - bid_limit
+                - auto_bid_limit
+              properties:
+                state:
+                  type: string
+                  example: 3
+                  description: Current state of participation
+                  enum:
+                    - STATE_PENDING
+                    - STATE_REJECTED
+                    - STATE_WINNER
+                    - STATE_BUY_NOW_WINNER
+                    - STATE_DEPOSIT_PENDING
+                created_at:
+                  type: string
+                  format: time.Time
+                  example: '2019-11-02T12:55:44Z'
+                  description: Time when participation was created
+                updated_at:
+                  type: string
+                  format: time.Time
+                  example: '2019-11-02T12:55:44Z'
+                  description: Time when participation was last updated (if not updated at all - is equal to `created_at`)
+                requested_buy_now:
+                  type: boolean
+                  example: true
+                  description: Defines whether participant has requested buy now option.
+                current_bid:
+                  type: string
+                  format: amount.Fiat
+                  example: '10000.00'
+                  description: Current bid of participant
+                bid_limit:
+                  type: string
+                  format: amount.Fiat
+                  example: '15000.00'
+                  description: 'Bid limit set to current participant (defined by admin, not by user).'
+                auto_bid_limit:
+                  type: string
+                  format: amount.Fiat
+                  example: '10000.00'
+                  description: Maximum bid to be set automatically (if user has enabled autobid option)
+            relationships:
+              type: object
+              required:
+                - lot
+                - account
+              properties:
+                lot:
+                  type: object
+                  description: Lot that is being participated in.
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/LotKey'
+                account:
+                  type: object
+                  description: Identity of account that participated in the auction.
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/IdentityKey'
+    ParticipationKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: '11'
+        type:
+          type: string
+          enum:
+            - participations
+    Ping:
+      allOf:
+        - $ref: '#/components/schemas/PingKey'
+        - type: object
+          required:
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - now
+              properties:
+                now:
+                  type: integer
+                  format: int64
+    PingKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+        type:
+          type: string
+          enum:
+            - pings
+    PutWinner:
+      allOf:
+        - type: object
+          required:
+            - type
+          properties:
+            type:
+              type: string
+              enum:
+                - winners
+        - type: object
+          required:
+            - attributes
+            - relationships
+          properties:
+            attributes:
+              type: object
+              required:
+                - fee
+                - fee_currency
+                - transportation_price
+                - transportation_price_currency
+                - state
+              properties:
+                invoice_id:
+                  type: string
+                  example: 75a96a65e0dcc89bbec34556.pdf
+                  description: ID of invoice to be paid (or already paid).
+                invoice_created_at:
+                  type: string
+                  format: time.Time
+                  description: Time when the invoice was created.
+                container_id:
+                  type: string
+                  description: ID of container.
+                container_link:
+                  type: string
+                  example: 'https://broadleaf.dev.shelf.network/new-profile/registered-lots/completed'
+                  description: Link of container.
+                fee:
+                  type: string
+                  format: amount.Fiat
+                  description: Fee amount to be paid (or already paid).
+                fee_currency:
+                  type: string
+                  description: Currency of fee to be paid in.
+                transportation_price:
+                  type: string
+                  format: amount.Fiat
+                  description: Price for transporting the vehicle.
+                transportation_price_currency:
+                  type: string
+                  description: Currency of transportation price.
+                state:
+                  type: string
+                  enum:
+                    - STATE_WAITING_FOR_INVOICE
+                    - STATE_WAITING_FOR_PAYMENT
+                    - STATE_DEAL_CANCELED
+                    - STATE_DEAL_COMPLETED
+                    - STATE_DELIVERED
+                    - STATE_IN_TRANSIT
+                  description: Current state of lot winner.
+                delivered_at:
+                  type: string
+                  format: time.Time
+            relationships:
+              type: object
+              required:
+                - account
+              properties:
+                account:
+                  type: object
+                  description: .......
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/IdentityKey'
+    SaleKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+        type:
+          type: string
+          enum:
+            - sales
+    Sold:
+      allOf:
+        - $ref: '#/components/schemas/SoldKey'
+        - type: object
+          required:
+            - attributes
+            - relationships
+          properties:
+            attributes:
+              type: object
+              required:
+                - amount
+                - is_pending
+              properties:
+                amount:
+                  type: string
+                  format: amount.Fiat
+                is_pending:
+                  type: bool
+                  description: sale is not finilized yet
+            relationships:
+              type: object
+              required:
+                - sale
+                - lot
+                - buyer
+              properties:
+                lot:
+                  type: object
+                  description: defines lot been sold
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/LotKey'
+                sale:
+                  type: object
+                  description: defines sale for which lot has been sold
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/SaleKey'
+                buyer:
+                  type: object
+                  description: defines account that won the lot
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/IdentityKey'
+    SoldKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+        type:
+          type: string
+          enum:
+            - solds
+    Token:
+      allOf:
+        - $ref: '#/components/schemas/TokenKey'
+        - type: object
+          required:
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - token
+              properties:
+                token:
+                  type: string
+                  description: jwt token
+    TokenKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+        type:
+          type: string
+          enum:
+            - tokens
+    UnknowLotEvent:
+      allOf:
+        - $ref: '#/components/schemas/UnknownLotEventKey'
+        - type: object
+          required:
+            - relationships
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - external_lot_id
+              properties:
+                external_lot_id:
+                  type: string
+            relationships:
+              type: object
+              required:
+                - sale
+              properties:
+                sale:
+                  type: object
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/SaleKey'
+    UnknownLotEventKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+        type:
+          type: string
+          enum:
+            - unknown_lot_events
+    Vehicle:
+      allOf:
+        - $ref: '#/components/schemas/VehicleKey'
+        - type: object
+          required:
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - extended_name
+                - images
+                - name
+                - on_approval
+              properties:
+                extended_name:
+                  type: string
+                images:
+                  type: array
+                  items:
+                    type: string
+                name:
+                  type: string
+                  example: '15044'
+                on_approval:
+                  type: bool
+    VehicleKey:
+      type: object
+      required:
+        - id
+        - type
+      properties:
+        id:
+          type: string
+          example: '11'
+        type:
+          type: string
+          enum:
+            - vehicles
+    Withdrawal:
+      allOf:
+        - $ref: '#/components/schemas/WithdrawalKey'
+        - type: object
+          required:
+            - relationships
+            - attributes
+          properties:
+            attributes:
+              type: object
+              required:
+                - state
+                - created_at
+                - updated_at
+              properties:
+                state:
+                  type: string
+                  enum:
+                    - STATE_UNKNOWN
+                    - STATE_PENDING
+                    - STATE_APPROVED
+                    - STATE_REJECTED
+                    - STATE_CANCELED
+                created_at:
+                  type: string
+                  format: time.Time
+                updated_at:
+                  type: string
+                  format: time.Time
+            relationships:
+              type: object
+              required:
+                - deposit
+              properties:
+                deposit:
+                  type: object
+                  description: defines deposit to be withdrawn
+                  properties:
+                    data:
+                      $ref: '#/components/schemas/DepositKey'
+    WithdrawalKey:
+      type: object
+      required:
+        - type
+        - id
+      properties:
+        type:
+          type: string
+          enum:
+            - withdrawals
+        id:
+          type: string
+          example: 01BX5ZZKBKACTAV9WEVGEMMVRZ
+  securitySchemes:
+    AdminBearerAuth:
+      description: Platform administrator token
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    BrokerBearerAuth:
+      description: Broker token
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    UserBearerAuth:
+      type: http
+      scheme: bearer

@@ -1,0 +1,18 @@
+put:
+  summary: Set auto bid limit
+  operationId: upsertMaxBid
+  tags:
+    - Participants
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              $ref: '#/components/schemas/AutoBidLimitPut'
+  responses:
+    '204':
+      description: No Content

@@ -1,0 +1,11 @@
+reader_test.go
+.gitsecret/keys/random_seed
+!*.secret
+helm/buying-power-svc/values-dev.yaml
+helm/buying-power-svc/values-prod.yaml
+writer_test.go
+telepresence.log
+config.local.yaml
+helm3/buying-power/values-development.yaml
+helm3/buying-power/values-production.yaml
+.vscode

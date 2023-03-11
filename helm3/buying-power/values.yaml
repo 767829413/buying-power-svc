@@ -1,0 +1,41 @@
+image:
+  repository: registry.gitlab.com/eauction/buying-power-svc
+  pullPolicy: Always
+  pullSecret: gitlab-eauction
+
+runtime:
+  args:
+    - run
+
+resources:
+  requests:
+    cpu: 100m
+    memory: "2Gi"
+  limits:
+    cpu: "0.5"
+    memory: "3Gi"
+
+postgresql:
+  enabled: true
+  fullnameOverride: "buying-power-svc-postgres"
+  image:
+    tag: "14"
+  postgresqlUsername: "postgres"
+  postgresqlDatabase: "postgres"
+  postgresqlPassword: "postgres"
+  persistence:
+    enabled: true
+    storageClass: "gp2"
+    accessModes:
+      - ReadWriteOnce
+    size: 15Gi
+  postgresExtendedConf:
+    # drop idle connections after an hour, active transactions won't be affected
+    dleInTransactionSessionTimeout: "1h"
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 200m
+      memory: 512Mi

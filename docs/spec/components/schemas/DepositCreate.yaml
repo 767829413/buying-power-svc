@@ -1,0 +1,40 @@
+allOf:
+  - type: object
+    required:
+      - type
+    properties:
+      type:
+        type: string
+        enum:
+          - deposits
+  - type: object
+    required:
+      - attributes
+      - relationships
+    properties:
+      attributes:
+        required:
+          - amount
+          - currency
+        type: object
+        properties:
+          amount:
+            type: string
+            format: amount.Fiat
+            description: defines amount of the deposit in cents in the currency of the deposit
+            example: '123.00'
+          currency:
+            description: defines currency of the deposit in ISO4217
+            type: string
+            example: USD
+      relationships:
+        type: object
+        required:
+          - depositor
+        properties:
+          depositor:
+            type: object
+            description: defines account that performed deposit
+            properties:
+              data:
+                $ref: '#/components/schemas/IdentityKey'

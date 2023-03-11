@@ -1,0 +1,177 @@
+allOf:
+  - $ref: '#/components/schemas/LotKey'
+  - type: object
+    required:
+      - attributes
+      - relationships
+    properties:
+      attributes:
+        type: object
+        required:
+          - currency
+          - buy_now_price
+          - business_total_price
+          - business_fee
+          - customer_total_price
+          - customer_fee
+          - created_at
+          - duration
+          - end_time
+          - highest_bid
+          - lot_type
+          - lot_type_i
+          - max_bid_step
+          - min_bid_step
+          - start_price
+          - start_time
+          - state
+          - state_updated_at
+          - is_bid_final
+          - name
+        properties:
+          currency:
+            type: string
+            example: "EUR"
+            description: Currency to calculate some of lot properties
+          business_total_price:
+            type: string
+            format: amount.Fiat
+            example: "40000.00"
+            description: Price of direct sale lot to be bought by business (non-zero only for direct sales).
+          business_fee:
+            type: string
+            format: amount.Fiat
+            example: "50.00"
+            description: Fee to be paid for business when buying a car - already included in `business_total_price` (non-zero only for direct sales).
+          customer_total_price:
+            type: string
+            format: amount.Fiat
+            example: "35000.00"
+            description: Price of direct sale lot to be bought by customer (non-zero only for direct sales).
+          customer_fee:
+            type: string
+            format: amount.Fiat
+            example: "100.55"
+            description: Fee to be paid for customer when buying a car - already included in `customer_total_price` (non-zero only for direct sales).
+          buy_now_price:
+            type: string
+            format: amount.Fiat
+            example: "5000.00"
+            description: Price to buy lot item without competition (if 0.00 - buy now option is turned off for the lot)
+          created_at:
+            type: string
+            format: time.Time
+            example: "2019-11-02T12:55:44Z"
+            description: Time when lot was created (may be different with `start_time`)
+          duration:
+            type: integer
+            format: int64
+            example: 4652378
+            description: Lot duration in seconds.
+          end_time:
+            format: time.Time
+            example: "2019-11-02T12:55:44Z"
+            description: Time when lot finishes accepting bids.
+          ended_at:
+            format: time.Time
+            example: "2019-11-02T12:55:44Z"
+            description: Time when lot was actually claimed as finished/sold.
+          highest_bid:
+            type: string
+            format: amount.Fiat
+            example: "25.00"
+            description: Highest bid for current time (currency is defined by `currency` field)
+          lot_type:
+            type: string
+            example: TYPE_ENG
+            enum:
+              - "TYPE_NO_AUCTION"
+              - "TYPE_ENG"
+              - "TYPE_COPART"
+              - "TYPE_IAAI"
+              - "TYPE_BNP"
+          lot_type_i:
+            type: integer
+            format: int32
+            example: 2
+          max_bid_step:
+            type: string
+            format: amount.Fiat
+            example: "50.00"
+            description: Maximum step to update bid.
+          min_bid_step:
+            type: string
+            format: amount.Fiat
+            example: "50.00"
+            description: Minimum step to update bid.
+          start_price:
+            type: string
+            format: amount.Fiat
+            example: "2500.00"
+            description: Price to start a bidding process from.
+          start_time:
+            format: time.Time
+            example: "2019-11-02T12:55:44Z"
+            description: Time lot becomes open for bids.
+          state:
+            type: string
+            example: 2
+            description: Defines current state of the lot.
+            enum:
+              - "STATE_UNKNOWN"
+              - "STATE_PENDING"
+              - "STATE_SOLD"
+              - "STATE_FINISHED"
+          state_updated_at:
+            type: string
+            format: time.Time
+            example: "2019-11-02T12:55:44Z"
+            description: Last time when lot state was updated.
+          is_bid_final:
+            type: bool
+          name:
+            type: string
+          item_number:
+            type: integer
+            format: int64
+      relationships:
+        type: object
+        required:
+          - organizer
+          - platform
+          - vehicle
+        properties:
+          vehicle:
+            type: object
+            description: Details of the vehicle that is being sold
+            properties:
+              data:
+                $ref: '#/components/schemas/VehicleKey'
+          participations:
+            type: object
+            description: Active participations of the lot
+            required:
+              - data
+            #properties:
+            #  data:
+            #    type: array
+            #    items:
+            #      $ref: '#/components/schemas/ParticipationKey'
+          organizer:
+            type: object
+            description: Identity of lot organizer.
+            properties:
+              data:
+                $ref: '#/components/schemas/IdentityKey'
+          platform:
+            type: object
+            description: Platform where the lot was created.
+            properties:
+              data:
+                $ref: '#/components/schemas/IdentityKey'
+          sale:
+            type: object
+            description: Sale of the lot
+            properties:
+              data:
+                $ref: '#/components/schemas/SaleKey'

@@ -1,0 +1,28 @@
+allOf:
+  - $ref: '#/components/schemas/LiveBidKey'
+  - type: object
+    required:
+      - relationships
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - amount
+        properties:
+          amount:
+            type: string
+            format: amount.Fiat
+            description: defines amount of bid
+            example: '123.00'
+      relationships:
+        type: object
+        required:
+          - lot
+        properties:
+          lot:
+            type: object
+            description: defines lot to which live bid is attached
+            properties:
+              data:
+                $ref: '#/components/schemas/LotKey'

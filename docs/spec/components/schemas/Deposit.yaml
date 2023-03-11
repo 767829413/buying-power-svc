@@ -1,0 +1,69 @@
+allOf:
+  - $ref: '#/components/schemas/DepositKey'
+  - type: object
+    required:
+      - relationships
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - state
+          - amount
+          - currency
+          - created_at
+          - updated_at
+        properties:
+          state:
+            type: string
+            enum:
+              - STATE_UNKNOWN
+              - STATE_PENDING
+              - STATE_PAID
+              - STATE_RETURNED
+              - STATE_FEE_CHARGED
+              - STATE_FAILED
+              - STATE_REVERSED
+              - STATE_LOCKED
+              - STATE_RETURNING
+              - STATE_REQUESTED_WITHDRAWAL
+          amount:
+            type: string
+            format: amount.Fiat
+            description: defines amount of the deposit in cents in the currency of the deposit.
+            example: '123.00'
+          currency:
+            type: string
+            description: defines currency of the deposit in ISO4217
+            example: USD
+          created_at:
+            type: string
+            format: time.Time
+          updated_at:
+            type: string
+            format: time.Time
+      relationships:
+        type: object
+        required:
+          - depositor
+        properties:
+          depositor:
+            type: object
+            description: defines account that performed deposit.
+            properties:
+              data:
+                $ref: '#/components/schemas/IdentityKey'
+          lot:
+            type: object
+            description: defines lot to which this deposit is attached
+            properties:
+              data:
+                $ref: '#/components/schemas/LotKey'
+          withdrawals:
+            type: object
+            description: defines withdrawals for the deposit
+            properties:
+              data:
+               type: array
+               item:
+                 $ref: '#/components/schemas/WithdrawalKey'

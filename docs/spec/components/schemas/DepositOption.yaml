@@ -1,0 +1,52 @@
+allOf:
+  - $ref: '#/components/schemas/DepositOptionKey'
+  - type: object
+    required:
+      - relationships
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - amount
+          - amount_currency
+          - buying_power
+          - buying_power_currency
+          - state
+        properties:
+          amount:
+            type: string
+            format: amount.Fiat
+            description: defines amount of the deposit in cents
+            example: '123.00'
+          amount_currency:
+            type: string
+            description: defines currency of the amount in ISO4217
+            example: USD
+          buying_power:
+            type: string
+            format: amount.Fiat
+            description: defines amount of the buying power
+          buying_power_currency:
+            type: string
+            description: defines currency of the buying power in ISO4217
+            example: EUR
+          state:
+            $ref: '#/components/schemas/DepositOptionState'
+      relationships:
+        type: object
+        properties:
+          deposits_to_attach:
+            type: object
+            description: defines account that performed deposit.
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DepositKey'
+          deposit_to_create:
+            type: object
+            description: describe deposit that needs to be created to be able to take specified buying power
+            properties:
+              data:
+                $ref: '#/components/schemas/DepositKey'

@@ -1,0 +1,52 @@
+allOf:
+  - $ref: '#/components/schemas/BidKey'
+  - type: object
+    required:
+      - relationships
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - amount
+          - next_bid_amount
+          - currency
+        properties:
+          amount:
+            type: string
+            format: amount.Fiat
+            description: defines amount of bid
+            example: '123.00'
+          next_bid_amount:
+            type: string
+            format: amount.Fiat
+            description: defines next bid amount
+            example: '123.00'
+          currency:
+            type: string
+            description: defines currency of the bid
+            example: USD
+      relationships:
+        type: object
+        required:
+          - lot
+          - bidder
+        properties:
+          lot:
+            type: object
+            description: defines lot to which this bid is attached
+            properties:
+              data:
+                $ref: '#/components/schemas/LotKey'
+          bidder:
+            type: object
+            description: defines buyer of the lot
+            properties:
+              data:
+                $ref: '#/components/schemas/IdentityKey'
+          sale:
+            type: object
+            description: defines sale in which bid took place
+            properties:
+              data:
+                $ref: '#/components/schemas/SaleKey'

@@ -1,0 +1,18 @@
+put:
+  summary: Set bid
+  operationId: setBid
+  tags:
+    - Participants
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              $ref: '#/components/schemas/BidPut'
+  responses:
+    '204':
+      description: No Content

@@ -1,0 +1,29 @@
+patch:
+  summary: Patch Deposit
+  operationId: patchDeposit
+  security:
+    - AdminBearerAuth: []
+  tags:
+    - Deposits
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              $ref: '#/components/schemas/DepositPatch'
+  responses:
+    '200':
+      description: Updated
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/Deposit'

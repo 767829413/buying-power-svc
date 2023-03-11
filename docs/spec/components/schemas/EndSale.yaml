@@ -1,0 +1,25 @@
+allOf:
+  - $ref: '#/components/schemas/EndSaleKey'
+  - type: object
+    required:
+      - relationships
+      - attributes
+    properties:
+      attributes:
+        required:
+          - reason
+        type: object
+        properties:
+          reason:
+            type: string
+      relationships:
+        type: object
+        required:
+          - sale
+        properties:
+          sale:
+            type: object
+            description: defines sale that ended
+            properties:
+              data:
+                $ref: '#/components/schemas/SaleKey'

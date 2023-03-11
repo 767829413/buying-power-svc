@@ -1,0 +1,21 @@
+parameters:
+  - in: path
+    name: lot
+    schema:
+      type: string
+      example: 413513212
+    required: true
+  - in: path
+    name: account
+    schema:
+      type: string
+      example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+    required: true
+delete:
+  summary: Reject participant
+  operationId: rejectParticipant
+  tags:
+    - Participants
+  responses:
+    '204':
+      description: No Content

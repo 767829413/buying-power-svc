@@ -1,0 +1,12 @@
+type: object
+required:
+  - id
+  - type
+properties:
+  id:
+    type: string
+    example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+  type:
+    type: string
+    enum:
+      - sales

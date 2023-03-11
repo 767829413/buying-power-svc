@@ -1,0 +1,32 @@
+allOf:
+  - $ref: '#/components/schemas/BonusTimeKey'
+  - type: object
+    required:
+      - attributes
+      - relationships
+    properties:
+      attributes:
+        type: object
+        required:
+          - duration_s
+        properties:
+          duration_s:
+            type: integer
+            format: int64
+            description: defines duration of the timer to show to user
+      relationships:
+        type: object
+        required:
+          - sale
+        properties:
+          lot:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/LotKey'
+          sale:
+            type: object
+            description: ..
+            properties:
+              data:
+                $ref: '#/components/schemas/SaleKey'

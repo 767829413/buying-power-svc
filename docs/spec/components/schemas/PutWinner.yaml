@@ -1,0 +1,77 @@
+allOf:
+  - type: object
+    required:
+      - type
+    properties:
+      type:
+        type: string
+        enum:
+          - winners
+  - type: object
+    required:
+      - attributes
+      - relationships
+    properties:
+      attributes:
+        type: object
+        required:
+          - fee
+          - fee_currency
+          - transportation_price
+          - transportation_price_currency
+          - state
+        properties:
+          invoice_id:
+            type: string
+            example: 75a96a65e0dcc89bbec34556.pdf
+            description: ID of invoice to be paid (or already paid).
+          invoice_created_at:
+            type: string
+            format: time.Time
+            description: Time when the invoice was created.
+          container_id:
+            type: string
+            description: ID of container.
+          container_link:
+            type: string
+            example: >-
+              https://broadleaf.dev.shelf.network/new-profile/registered-lots/completed
+            description: Link of container.
+          fee:
+            type: string
+            format: amount.Fiat
+            description: Fee amount to be paid (or already paid).
+          fee_currency:
+            type: string
+            description: Currency of fee to be paid in.
+          transportation_price:
+            type: string
+            format: amount.Fiat
+            description: Price for transporting the vehicle.
+          transportation_price_currency:
+            type: string
+            description: Currency of transportation price.
+          state:
+            type: string
+            enum:
+              - STATE_WAITING_FOR_INVOICE
+              - STATE_WAITING_FOR_PAYMENT
+              - STATE_DEAL_CANCELED
+              - STATE_DEAL_COMPLETED
+              - STATE_DELIVERED
+              - STATE_IN_TRANSIT
+            description: Current state of lot winner.
+          delivered_at:
+            type: string
+            format: time.Time
+      relationships:
+        type: object
+        required:
+          - account
+        properties:
+          account:
+            type: object
+            description: .......
+            properties:
+              data:
+                $ref: '#/components/schemas/IdentityKey'

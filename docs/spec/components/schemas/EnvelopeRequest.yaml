@@ -1,0 +1,52 @@
+allOf:
+  - type: object
+    required:
+      - type
+    properties:
+      type:
+        type: string
+        enum:
+          - envelopes
+  - type: object
+    required:
+      - relationships
+    properties:
+      relationships:
+        type: object
+        properties:
+          subscribe:
+            type: object
+            description: defines sale
+            properties:
+              data:
+                $ref: '#/components/schemas/SaleKey'
+          subscribe_participation:
+            type: object
+            description: defines identity of the participation
+            properties:
+              data:
+                $ref: '#/components/schemas/IdentityKey'
+          unsubscribe:
+            type: object
+            description: defines sale from which we should unsubscribe
+            properties:
+              data:
+                $ref: '#/components/schemas/SaleKey'
+          authorize:
+            type: object
+            description: defines token that is used for authorization. Must be sent first after connection
+            properties:
+              data:
+                $ref: '#/components/schemas/TokenKey'
+          bid:
+            type: object
+            description: defines bid to be placed for the lot
+            properties:
+              data:
+                $ref: '#/components/schemas/LiveBidKey'
+          ping:
+            type: object
+            description: defines app level ping
+            properties:
+              data:
+                $ref: '#/components/schemas/PingKey'

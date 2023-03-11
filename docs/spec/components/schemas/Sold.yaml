@@ -1,0 +1,44 @@
+allOf:
+  - $ref: '#/components/schemas/SoldKey'
+  - type: object
+    required:
+      - attributes
+      - relationships
+    properties:
+      attributes:
+        type: object
+        required:
+          - amount
+          - is_pending
+        properties:
+          amount:
+            type: string
+            format: amount.Fiat
+          is_pending:
+            type: bool
+            description: sale is not finilized yet
+      relationships:
+        type: object
+        required:
+          - sale
+          - lot
+          - buyer
+        properties:
+          lot:
+            type: object
+            description: defines lot been sold
+            properties:
+              data:
+                $ref: '#/components/schemas/LotKey'
+          sale:
+            type: object
+            description: defines sale for which lot has been sold
+            properties:
+              data:
+                $ref: '#/components/schemas/SaleKey'
+          buyer:
+            type: object
+            description: defines account that won the lot
+            properties:
+              data:
+                $ref: '#/components/schemas/IdentityKey'

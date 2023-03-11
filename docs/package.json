@@ -1,0 +1,13 @@
+{
+  "name": "buying-power-svc",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "swagger-repo serve",
+    "build": "mkdir -p ../public && swagger-repo build -o ../public",
+    "test": "swagger-repo validate"
+  },
+  "dependencies": {
+    "swagger-repo": "^2.0.0-rc.11"
+  }
+}

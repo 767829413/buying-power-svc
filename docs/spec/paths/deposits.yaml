@@ -1,0 +1,98 @@
+post:
+  summary: Create Deposit
+  operationId: createDeposit
+  security:
+    - UserBearerAuth: []
+  description: User must have verified phone
+  tags:
+    - Deposits
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              $ref: '#/components/schemas/DepositCreate'
+  responses:
+    '201':
+      description: Created
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/Deposit'
+
+get:
+  parameters:
+    - in: query
+      name: 'filter[depositor]'
+      schema:
+        type: string
+    - in: query
+      name: 'filter[lot]'
+      schema:
+        type: string
+    - in: query
+      name: 'filter[state]'
+      schema:
+        type: string
+        enum:
+          - STATE_UNKNOWN
+          - STATE_PENDING
+          - STATE_PAID
+          - STATE_RETURNED
+          - STATE_FEE_CHARGED
+          - STATE_FAILED
+          - STATE_REVERSED
+          - STATE_LOCKED
+          - STATE_RETURNING
+          - STATE_REQUESTED_WITHDRAWAL
+    - in: query
+      name: 'page[limit]'
+      description: Defines limit of the page (default `10`).
+      schema:
+        type: string
+    - in: query
+      name: 'page[number]'
+      description: Defines the number of the page to return (default `0`).
+      schema:
+        type: string
+    - in: query
+      name: 'include'
+      schema:
+        type: string
+        enum:
+          - withdrawals
+  summary: Deposits
+  operationId: getDepositsList
+  tags:
+    - Deposits
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Deposit'
+              links:
+                $ref: '#/components/schemas/Links'
+              included:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/Withdrawal'
+

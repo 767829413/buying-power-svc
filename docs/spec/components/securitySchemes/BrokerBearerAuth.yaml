@@ -1,0 +1,4 @@
+description: Broker token
+type: http
+scheme: bearer
+bearerFormat: JWT

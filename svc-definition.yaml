@@ -1,0 +1,20 @@
+- org: "Platform"
+  storage:
+    - type: "PostgreSQL"
+      write:
+        - "buying-power"
+      read:
+        - "buying-power"
+    - type: "Kafka"
+      read:
+        - "auctions_v2"
+        - "identities"
+        - "tbc_transactions_v2"
+      write:
+        - "deposits"
+        - "auctions_v2"
+  http_call:
+    - "copart.com"
+    - "platformer"
+    - "enumer"
+    - "payment_service"

@@ -1,0 +1,48 @@
+get:
+  summary: Subscribe to bidding events
+  operationId: ws
+  security:
+    - UserBearerAuth: []
+  description: JWT token must be first message sent to the connection. Request and Response defines schemas for write and read envelopes. To connect use `wss://buyws.dev.shelf.network/ws/`
+  tags:
+    - Bidding
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              $ref: '#/components/schemas/EnvelopeRequest'
+            included:
+              type: array
+              items:
+                oneOf:
+                  - $ref: '#/components/schemas/Token'
+                  - $ref: '#/components/schemas/LiveBid'
+  responses:
+    '200':
+      description: Ok
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/Envelope'
+              included:
+                type: array
+                items:
+                  oneOf:
+                    - $ref: '#/components/schemas/Error'
+                    - $ref: '#/components/schemas/Bid'
+                    - $ref: '#/components/schemas/BonusTime'
+                    - $ref: '#/components/schemas/Sold'
+                    - $ref: '#/components/schemas/EndSale'
+                    - $ref: '#/components/schemas/Lot'
+                    - $ref: '#/components/schemas/Vehicle'
+                    - $ref: '#/components/schemas/Participation'

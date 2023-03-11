@@ -1,0 +1,16 @@
+allOf:
+  - $ref: '#/components/schemas/ErrorKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - code
+          - message
+        properties:
+          code:
+            type: integer
+          message:
+            type: string

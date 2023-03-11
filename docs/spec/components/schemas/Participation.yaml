@@ -1,0 +1,74 @@
+allOf:
+  - $ref: '#/components/schemas/ParticipationKey'
+  - type: object
+    required:
+      - attributes
+      - relationships
+    properties:
+      attributes:
+        type: object
+        required:
+          - state
+          - created_at
+          - requested_buy_now
+          - current_bid
+          - bid_limit
+          - auto_bid_limit
+        properties:
+          state:
+            type: string
+            example: 3
+            description: Current state of participation
+            enum:
+              - "STATE_PENDING"
+              - "STATE_REJECTED"
+              - "STATE_WINNER"
+              - "STATE_BUY_NOW_WINNER"
+              - "STATE_DEPOSIT_PENDING"
+          created_at:
+            type: string
+            format: time.Time
+            example: "2019-11-02T12:55:44Z"
+            description: Time when participation was created
+          updated_at:
+            type: string
+            format: time.Time
+            example: "2019-11-02T12:55:44Z"
+            description: Time when participation was last updated (if not updated at all - is equal to `created_at`)
+          requested_buy_now:
+            type: boolean
+            example: true
+            description: Defines whether participant has requested buy now option.
+          current_bid:
+            type: string
+            format: amount.Fiat
+            example: "10000.00"
+            description: Current bid of participant
+          bid_limit:
+            type: string
+            format: amount.Fiat
+            example: "15000.00"
+            description: Bid limit set to current participant (defined by admin, not by user).
+          auto_bid_limit:
+            type: string
+            format: amount.Fiat
+            example: "10000.00"
+            description: Maximum bid to be set automatically (if user has enabled autobid option)
+      relationships:
+        type: object
+        required:
+          - lot
+          - account
+        properties:
+          lot:
+            type: object
+            description: Lot that is being participated in.
+            properties:
+              data:
+                $ref: '#/components/schemas/LotKey'
+          account:
+            type: object
+            description: Identity of account that participated in the auction.
+            properties:
+              data:
+                $ref: '#/components/schemas/IdentityKey'

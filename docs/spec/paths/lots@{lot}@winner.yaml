@@ -1,0 +1,25 @@
+parameters:
+  - in: path
+    name: lot
+    schema:
+      type: string
+      example: 19846712
+    required: true
+put:
+  summary: Upsert winner details and marks participant as winner.
+  operationId: upsertWinnerDetails
+  tags:
+    - Winners
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              $ref: '#/components/schemas/PutWinner'
+  responses:
+    '204':
+      description: No Content

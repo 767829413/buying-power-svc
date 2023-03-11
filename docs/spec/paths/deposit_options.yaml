@@ -1,0 +1,34 @@
+get:
+  parameters:
+    - in: query
+      name: 'filter[depositor]'
+      schema:
+        type: string
+    - in: query
+      name: 'include'
+      schema:
+        type: string
+        enum:
+          - deposits_to_attach
+          - deposit_to_create
+  summary: Returns list of deposits allowed to perform for depositor
+  operationId: getDepositOptions
+  tags:
+    - Deposits
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DepositOption'
+              links:
+                $ref: '#/components/schemas/Links'
+

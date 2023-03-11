@@ -1,0 +1,14 @@
+allOf:
+  - $ref: '#/components/schemas/DepositKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        properties:
+          state:
+            type: string
+            enum:
+              - STATE_RETURNING
+              - STATE_PAID

@@ -1,0 +1,81 @@
+log:
+  level: debug
+  disable_sentry: true
+
+db:
+  url: postgres://postgres:postgres@localhost:5433/postgres?sslmode=disable
+  max_open_connection: 24
+  max_idle_connections: 24
+
+kafka:
+  group_id: buying-power-local-1
+  brokers:
+    - "localhost:9092"
+
+lots_ingest:
+  skip_until_offset: 7360000
+
+listener:
+  addr: :8080
+
+platformer:
+  url: https://api.dev.shelf.network/platformer
+
+horizon:
+  url: https://api.dev.shelf.network/horizon
+
+exrates_converter:
+  url: "https://api.dev.shelf.network/exrates"
+
+payment_service:
+  url: "http://localhost:9999"
+
+copart-live-bidder:
+  is_enabled: false
+
+deposits:
+  expires_in: 720h
+  lot_processing_duration: 72h
+  currency: USD
+  max_amount: 1200000
+  default_limits:
+    limits:
+    - deposit: 30000
+      limit: 500000
+    - deposit: 60000
+      limit: 1000000
+    - deposit: 120000
+      limit: 1500000
+      is_buy_now_allowed: true
+    - deposit: 1000000
+      limit: 3000000
+      is_buy_now_allowed: true
+      is_recharger_only: true
+  platform_limits:
+    GDFYVBE2LW6R67SKBGWB3PRU7UYJAHBYHKWYGKFJ4BOWMA7DMASYYJ6M:
+      limits:
+      - deposit: 30000
+        limit: 300000
+        is_buy_now_allowed: true
+      - deposit: 60000
+        limit: 600000
+        is_buy_now_allowed: true
+      - deposit: 120000
+        limit: 1200000
+        is_buy_now_allowed: true
+      - deposit: 180000
+        limit: 1800000
+        is_buy_now_allowed: true
+      - deposit: 1000000
+        limit: 3000000
+        is_buy_now_allowed: true
+        is_recharger_only: true
+  buying_power_recharger:
+    is_enabled: true
+    target_deposit_amount: 50000000
+
+enumer:
+  url: "http://api.dev.shelf.network/enumer"
+
+bouncer:
+  skip_checks: false

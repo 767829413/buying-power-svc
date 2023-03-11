@@ -1,0 +1,13 @@
+type: object
+required:
+  - id
+  - type
+properties:
+  id:
+    type: string
+    example: GAKSJ2RIABAPHE7K3NRZVNVOVB3KNSH5Q3BKFKDU3EYDLSQHWEI3ZV4F
+    description: defines ID of the request. Empty for common events
+  type:
+    type: string
+    enum:
+      - envelopes

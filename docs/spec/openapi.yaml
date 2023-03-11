@@ -1,0 +1,21 @@
+openapi: 3.0.0
+info:
+  version: 0.1.0
+  title: Buying-power service
+  x-logo:
+    url: >-
+      https://static.wixstatic.com/media/0cc997_9a88f1825e12451d80e7a907b87d2796~mv2.png
+  description: >-
+    Buying power is a module responsible for holding and managing users' deposits.
+    It interacts with payments providers using `payments-api` service.
+    To participate in the auction, the user has to deposit some funds as collateral for his bids.
+    Deposits happy path:
+    * User requests a list of deposits he can perform (we can have several nominations of deposits like 300 USD, 500 USD, and 1000 USD). Available options also depend on the number of funds we hold for the user. Example: Max amount is 1500 USD in total. The user has two active deposits of 500 USD, so we return 300 USD and 500 USD.
+    * User creates a deposit that redirects him to the payment provider (handled by the front-end and `payment-api`).
+    * Deposit state is updated in `internal/services/ingest/tbc`. Buying-power-svc listens to incoming events and updates the state of the deposit accordingly
+    * As soon as the payments provider confirms the deposit, the user can attach the deposit to the active lot. Also corresponding `lead` is created and marked accordingly in the admin panel. It's not possible to attach a deposit to any lot. For example: if live bidding for the lot starts far away in the future before the deposit is automatically unlocked from the user's credit card, it won't be possible to attach. Successful attachment of deposit allows bidding up to a certain amount defined in config.
+    * If the lot's state changes to lost, we automatically detach the deposit from the lot, so it can be attached again to a new one.
+    * If the user's bid won the lot and the broker confirms it, `buying-power-svc` charges deposit state from preauthorization to actual charge.
+
+servers:
+  - url: 'https://api.dev.shelf.network/buying-power'

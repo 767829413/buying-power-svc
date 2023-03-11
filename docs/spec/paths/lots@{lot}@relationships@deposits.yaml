@@ -1,0 +1,28 @@
+parameters:
+  - in: path
+    name: lot
+    schema:
+      type: string
+      example: 413513212
+    required: true
+put:
+  deprecated: true
+  summary: Attach deposits to lot
+  operationId: attachDeposits
+  security:
+    - UserBearerAuth: []
+  tags:
+    - Deposits
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: '#/components/schemas/DepositKey'
+  responses:
+    '204':
+      description: No Content

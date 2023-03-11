@@ -1,0 +1,12 @@
+type: object
+required:
+  - self
+  - prev
+  - next
+properties:
+  self:
+    type: string
+  prev:
+    type: string
+  next:
+    type: string

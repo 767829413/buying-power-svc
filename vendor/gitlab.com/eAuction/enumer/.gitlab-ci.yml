@@ -1,0 +1,94 @@
+stages:
+  - build
+  - deploy
+  - publish
+  - pages
+  - lint
+
+changelog:
+  image: registry.gitlab.com/eauction/devops-stuff/ops-cli/dockerbuild:1
+  stage: lint
+  tags:
+    - shelf
+  only:
+    - merge_request
+  script:
+    - is_merge_diff CHANGELOG.md
+
+build-image-mr:
+  image: registry.gitlab.com/eauction/devops-stuff/ops-cli/dockerbuild:1
+  stage: build
+  only:
+    - merge_request
+  tags:
+    - shelf
+  script:
+    - build
+
+build-image:
+  image: registry.gitlab.com/eauction/devops-stuff/ops-cli/dockerbuild:1
+  stage: build
+  tags:
+    - shelf
+  script:
+    - build
+
+.deploy_template: &deploy_definition
+  image: registry.gitlab.com/eauction/devops-stuff/ops-cli/helmdeploy:1
+  stage: deploy
+  tags:
+    - shelf
+  script:
+    - deploy
+
+deploy-service-to-development:
+  <<: *deploy_definition
+  environment:
+    name: development
+  only:
+    - master
+
+deploy-service-to-staging:
+  <<: *deploy_definition
+  environment:
+    name: staging
+  only:
+    - /^rc-.*/
+
+deploy-service-to-production:
+  <<: *deploy_definition
+  environment:
+    name: production
+  only:
+    - /^stable-.*/
+
+pages:
+  image: node:8
+  stage: pages
+  only:
+    refs:
+      - master
+    changes:
+      - docs/**/*
+  script:
+    - cd docs
+    - npm install
+    - npm run build
+  tags:
+    - shelf
+  artifacts:
+    paths:
+      - public
+
+
+publish-dockerhub:
+  image: registry.gitlab.com/eauction/devops-stuff/ops-cli/dockerpublish:1
+  stage: publish
+  tags:
+    - shelf
+  only:
+    - /^publish-.*/
+  variables:
+    DH_REPO: enumer
+  script:
+    - publish

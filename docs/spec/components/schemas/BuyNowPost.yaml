@@ -1,0 +1,31 @@
+allOf:
+  - type: object
+    required:
+      - type
+    properties:
+      type:
+        type: string
+        enum:
+          - buy_nows
+  - type: object
+    required:
+      - relationships
+    properties:
+      relationships:
+        type: object
+        required:
+          - lot
+          - account
+        properties:
+          lot:
+            type: object
+            description: ...
+            properties:
+              data:
+                $ref: '#/components/schemas/LotKey'
+          account:
+            type: object
+            description: ...
+            properties:
+              data:
+                $ref: '#/components/schemas/IdentityKey'

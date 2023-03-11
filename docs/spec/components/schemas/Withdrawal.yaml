@@ -1,0 +1,39 @@
+allOf:
+  - $ref: '#/components/schemas/WithdrawalKey'
+  - type: object
+    required:
+      - relationships
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - state
+          - created_at
+          - updated_at
+        properties:
+          state:
+            type: string
+            enum:
+              - STATE_UNKNOWN
+              - STATE_PENDING
+              - STATE_APPROVED
+              - STATE_REJECTED
+              - STATE_CANCELED
+          created_at:
+            type: string
+            format: time.Time
+          updated_at:
+            type: string
+            format: time.Time
+      relationships:
+        type: object
+        required:
+          - deposit
+        properties:
+          deposit:
+            type: object
+            description: defines deposit to be withdrawn
+            properties:
+              data:
+                $ref: '#/components/schemas/DepositKey'

@@ -1,0 +1,52 @@
+get:
+  parameters:
+    - in: query
+      name: 'filter[depositor]'
+      schema:
+        type: string
+    - in: query
+      name: 'filter[is_buy_now]'
+      description: signals if we need to calculate options for buy now
+      schema:
+        type: bool
+    - in: query
+      name: 'filter[customer_price]'
+      description: price customer is willing to pay
+      schema:
+        type: string
+        format: amount.Fiat
+        example: "200.00"
+    - in: query
+      name: 'filter[customer_price_currency]'
+      description: currency of the customer price
+      schema:
+        type: string
+        example: "USD"
+    - in: query
+      name: 'include'
+      schema:
+        type: string
+        enum:
+          - deposits_to_attach
+          - deposit_to_create
+  summary: Returns list of deposits allowed to attach to specified lot
+  operationId: getDepositOptionsLot
+  tags:
+    - Deposits
+  responses:
+    '200':
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DepositOption'
+              links:
+                $ref: '#/components/schemas/Links'
+

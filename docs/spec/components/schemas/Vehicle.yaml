@@ -1,0 +1,25 @@
+allOf:
+  - $ref: '#/components/schemas/VehicleKey'
+  - type: object
+    required:
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - extended_name
+          - images
+          - name
+          - on_approval
+        properties:
+          extended_name:
+            type: string
+          images:
+            type: array
+            items:
+              type: string
+          name:
+            type: string
+            example: "15044"
+          on_approval:
+            type: bool

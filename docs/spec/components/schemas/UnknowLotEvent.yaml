@@ -1,0 +1,24 @@
+allOf:
+  - $ref: '#/components/schemas/UnknownLotEventKey'
+  - type: object
+    required:
+      - relationships
+      - attributes
+    properties:
+      attributes:
+        type: object
+        required:
+          - external_lot_id
+        properties:
+          external_lot_id:
+            type: string
+      relationships:
+        type: object
+        required:
+          - sale
+        properties:
+          sale:
+            type: object
+            properties:
+              data:
+                $ref: '#/components/schemas/SaleKey'

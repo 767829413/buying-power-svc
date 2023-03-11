@@ -1,0 +1,9 @@
+apiVersion: v2
+description: A Helm chart for buying power service.
+name: buying-power
+version: 0.1.0
+dependencies:
+- name: postgresql
+  version: 8.0.0
+  repository: "https://charts.bitnami.com/bitnami"
+  condition: postgresql.enabled

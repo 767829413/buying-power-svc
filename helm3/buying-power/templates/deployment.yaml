@@ -1,0 +1,91 @@
+{{- $fullName := include "service.fullname" . -}}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $fullName }}
+  labels:
+{{ include "service.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "service.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "service.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+      annotations:
+        checksum/config: {{ toYaml .Values.configYaml | sha256sum | quote }}
+    spec:
+{{- if .Values.image.pullSecret }}
+      imagePullSecrets:
+        - name: {{ .Values.image.pullSecret }}
+{{- end }}
+      volumes:
+        - name: config
+          secret:
+            secretName: {{ $fullName }}
+{{- if .Values.gcp }}
+        - name: google-cloud-key
+          secret:
+            secretName: {{ .Values.gcp.secretName}}
+{{- end }}
+{{- if .Values.postgresql.enabled }}
+      initContainers:
+      - name: init
+        image: {{ .Values.image.repository }}:{{ .Values.image.version }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        args:
+          - migrate
+          - up
+        volumeMounts:
+          - name: config
+            mountPath: "/config"
+            readOnly: true
+        env:
+          - name: KV_VIPER_FILE
+            value: /config/config.yaml
+{{- end }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.version }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          args:
+{{- range .Values.runtime.args }}
+            - {{ . | quote }}
+{{- end }}
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: "/config"
+              readOnly: true
+  {{- if .Values.gcp }}
+            - name: google-cloud-key
+              mountPath: /var/secrets/google
+  {{- end }}
+          env:
+            - name: KV_VIPER_FILE
+              value: /config/config.yaml
+  {{- if .Values.gcp }}
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /var/secrets/google/{{ .Values.gcp.keyFileName }}
+  {{- end }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}
+    {{- with .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}

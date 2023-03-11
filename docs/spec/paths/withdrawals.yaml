@@ -1,0 +1,30 @@
+post:
+  summary: Create Withdrawal
+  operationId: createWithdrawal
+  security:
+    - UserBearerAuth: []
+  tags:
+    - Withdrawals
+  requestBody:
+    content:
+      application/json:
+        schema:
+          type: object
+          required:
+            - data
+          properties:
+            data:
+              $ref: '#/components/schemas/DepositKey'
+  responses:
+    '200':
+      description: Created
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - data
+            properties:
+              data:
+                $ref: '#/components/schemas/Withdrawal'
+

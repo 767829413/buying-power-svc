@@ -1,0 +1,6 @@
+type: string
+format: types.DepositOptionState
+enum:
+  - taken
+  - not_available
+  - available
